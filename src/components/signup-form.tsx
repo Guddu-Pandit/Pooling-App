@@ -107,13 +107,13 @@ router.push("/")
           <p className="text-sm text-red-500 text-center">{error}</p>
         )}
 
-        <Button type="submit" className="w-full" disabled={loading}>
+        <Button type="submit" className="w-full bg-teal-700 hover:bg-teal-600 cursor-pointer text-amber-50" disabled={loading}>
           {loading ? "Creating account..." : "Sign Up"}
         </Button>
 
         <FieldDescription className="text-center">
           Already have an account?{" "}
-          <a href="/" className="underline">
+          <a href="/" className="underline cursor-pointer">
             Login
           </a>
         </FieldDescription>

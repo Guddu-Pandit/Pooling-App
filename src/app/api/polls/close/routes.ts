@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import {createAdminClient} from "@/utils/supabase/admin";
+import  {createAdminClient}  from "@/utils/supabase/admin";
 
 export async function POST(req: Request) {
   const { pollId } = await req.json();
@@ -7,7 +7,7 @@ export async function POST(req: Request) {
 
   const { error } = await supabase
     .from("polls")
-    .delete()
+    .update({ is_active: false })
     .eq("id", pollId);
 
   if (error) {

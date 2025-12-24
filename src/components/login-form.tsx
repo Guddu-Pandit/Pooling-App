@@ -59,7 +59,7 @@ export default function LoginForm({
               <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>
                 <p className="text-muted-foreground text-balance">
-                  Login to your Acme Inc account
+                  Login to your Polling Account
                 </p>
               </div>
 
@@ -94,7 +94,7 @@ export default function LoginForm({
               )}
 
               <Field>
-                <Button type="submit" disabled={loading}>
+                <Button type="submit" disabled={loading} className="bg-teal-700 hover:bg-teal-600 cursor-pointer text-amber-50">
                   {loading ? "Logging in..." : "Login"}
                 </Button>
               </Field>

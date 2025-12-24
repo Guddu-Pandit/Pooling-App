@@ -13,7 +13,7 @@ export default async function Navbar() {
   let role: "user" | "admin" | null = null;
 
   if (user) {
-    const { data } = await supabase
+    const { data } = await supabase 
       .from("profiles_poll")
       .select("role")
       .eq("id", user.id)
@@ -29,13 +29,15 @@ export default async function Navbar() {
           Polling App
         </Link>
 
-        <div className="flex items-center gap-4 cursor-pointer">
-          <Link href="/dashboard" className="text-black">Dashboard</Link>
+        <div className="flex items-center gap-4 cursor-pointer ">
+          {/* <Link href="/dashboard" className="text-black font-semibold">Dashboard</Link> */}
+         <Link href="/polls" className="text-black font-semibold">All Polls</Link>
+
 
           {/* ✅ ADMIN ONLY */}
           {role === "admin" && (
             <Link href="/admin">
-              <Button variant="secondary" className="cursor-pointer bg-white text-black ">Admin Panel</Button>
+              <Button variant="secondary" className="cursor-pointer text-1xl bg-white text-black ">Admin Panel</Button>
             </Link>
           )}
 
