@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type PollVoteButtonProps = {
   pollId: string;
@@ -14,7 +14,16 @@ export default function PollVoteButton({
   text,
 }: PollVoteButtonProps) {
   const [loading, setLoading] = useState(false);
-  const [voted, setVoted] = useState(false);
+  const [hasVoted, setHasVoted] = useState(false);
+
+  useEffect(() => {
+    const checkVote = async () => {
+      const res = await fetch(`/api/polls/check-vote?pollId=${pollId}`);
+      if (res.ok) setHasVoted(true);
+    };
+
+    checkVote();
+  }, [pollId]);
 
   const handleVote = async () => {
     setLoading(true);
@@ -26,7 +35,7 @@ export default function PollVoteButton({
     });
 
     if (res.ok) {
-      setVoted(true);
+      setHasVoted(true);
     }
 
     setLoading(false);
@@ -35,10 +44,10 @@ export default function PollVoteButton({
   return (
     <button
       onClick={handleVote}
-      disabled={loading || voted}
+      disabled={loading || hasVoted}
       className="w-full border rounded px-4 py-2 hover:bg-muted disabled:opacity-50"
     >
-      {text}
+      {hasVoted ? "Voted" : text}
     </button>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
 
@@ -8,12 +8,34 @@ export default function VoteForm({ poll }: any) {
   const supabase = createClient();
   const [selected, setSelected] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [hasVoted, setHasVoted] = useState(false);
+
+  useEffect(() => {
+    const checkVote = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) return;
+
+      const { data } = await supabase
+        .from("votes")
+        .select("option_id")
+        .eq("poll_id", poll.id)
+        .eq("user_id", user.id)
+        .single();
+
+      if (data) {
+        setHasVoted(true);
+        setSelected(data.option_id);
+      }
+    };
+
+    checkVote();
+  }, [poll.id, supabase]);
 
   const submitVote = async () => {
-    if (!selected) {
-      alert("Select an option");
-      return;
-    }
+    if (!selected) return alert("Select an option");
 
     setLoading(true);
 
@@ -33,8 +55,12 @@ export default function VoteForm({ poll }: any) {
       user_id: user.id,
     });
 
-    if (error) alert(error.message);
-    else alert("Vote submitted ✅");
+    if (error) {
+      alert(error.message);
+    } else {
+      setHasVoted(true);
+      alert("Vote submitted ✅");
+    }
 
     setLoading(false);
   };
@@ -46,14 +72,16 @@ export default function VoteForm({ poll }: any) {
           <input
             type="radio"
             name={`poll-${poll.id}`}
+            disabled={hasVoted}
+            checked={selected === opt.id}
             onChange={() => setSelected(opt.id)}
           />
           {opt.option_text}
         </label>
       ))}
 
-      <Button onClick={submitVote} disabled={loading}>
-        {loading ? "Submitting..." : "Vote"}
+      <Button onClick={submitVote} disabled={loading || hasVoted}>
+        {hasVoted ? "Already Voted" : loading ? "Submitting..." : "Vote"}
       </Button>
     </div>
   );
