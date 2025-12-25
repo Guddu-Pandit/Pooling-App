@@ -1,8 +1,16 @@
 import { NextResponse } from "next/server";
 import  {createAdminClient}  from "@/utils/supabase/admin";
+import { createClient } from "@/utils/supabase/server"; // For auth check
+
 
 export async function POST(req: Request) {
-  const supabase = createAdminClient(); // server-only
+    const supabase = await createClient();
+
+  const adminsupabase = createAdminClient(); // server-only
+  const { data: { user } } = await supabase.auth.getUser();
+ if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   const body = await req.json();
   const { title, description, options } = body;
@@ -13,6 +21,7 @@ export async function POST(req: Request) {
     .insert({
       title,
       description,
+      created_by: user.id,
       is_active: true, // admin polls active immediately
     })
     .select()

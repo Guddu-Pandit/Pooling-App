@@ -28,7 +28,10 @@ export default function PollCard({ poll }: { poll: Poll }) {
         data: { user },
       } = await supabase.auth.getUser();
 
+      console.log("🔍 Poll ID:", poll.id);
+      console.log("Poll created_by:", poll.created_by); // ✅ DEBUG
       if (!user) return;
+      console.log("User ID:", user.id); // ✅ DEBUG
 
       const { data: profile } = await supabase
         .from("profiles_poll")
@@ -37,7 +40,10 @@ export default function PollCard({ poll }: { poll: Poll }) {
         .single();
 
       if (poll.created_by === user.id || profile?.role === "admin") {
+        console.log("✅ USER IS OWNER - Delete button visible");
         setCanDelete(true);
+      } else {
+        console.log("❌ User is NOT owner");
       }
     };
 
@@ -67,9 +73,7 @@ export default function PollCard({ poll }: { poll: Poll }) {
         <h2 className="font-semibold">{poll.title}</h2>
 
         {poll.description && (
-          <p className="text-sm text-muted-foreground">
-            {poll.description}
-          </p>
+          <p className="text-sm text-muted-foreground">{poll.description}</p>
         )}
       </div>
 
