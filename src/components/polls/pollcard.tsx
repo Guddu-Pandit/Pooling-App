@@ -68,7 +68,7 @@ export default function PollCard({ poll }: { poll: Poll }) {
   };
 
   return (
-    <div className="border rounded-lg p-4 space-y-3">
+    <div className="border max-w-md rounded-lg p-4 space-y-3">
       <div>
         <h2 className="font-semibold">{poll.title}</h2>
 
@@ -76,16 +76,16 @@ export default function PollCard({ poll }: { poll: Poll }) {
           <p className="text-sm text-muted-foreground">{poll.description}</p>
         )}
       </div>
-
+      
       {/* ✅ OPTIONS + VOTE */}
       <VoteForm poll={poll} />
 
       {/* ✅ DELETE BUTTON */}
-      {canDelete && (
+      {/* {canDelete && (
         <Button variant="destructive" size="sm" onClick={deletePoll}>
           Delete
         </Button>
-      )}
+      )} */}
     </div>
   );
 }

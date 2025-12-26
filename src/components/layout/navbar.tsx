@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { ChartColumn, LogOut } from "lucide-react";
 
 export default async function Navbar() {
   const supabase = await createClient();
@@ -24,14 +24,16 @@ export default async function Navbar() {
 
   return (
     <nav className="border-b">
-      <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
-        <Link href="/dashboard" className="font-bold text-xl cursor-pointer">
-          Polling App
+      <div className="mx-auto max-w-5xl px-5 py-4 flex items-center justify-between">
+        <div className="font-bold text-2xl  cursor-pointer">       
+           <Link href="/dashboard" className="flex gap-2">
+          <ChartColumn  className="mt-1 "/>Polling App
         </Link>
+        </div>
 
         <div className="flex items-center gap-4 cursor-pointer ">
           {/* <Link href="/dashboard" className="text-black font-semibold">Dashboard</Link> */}
-         <Link href="/polls" className="text-black font-semibold">All Polls</Link>
+         {/* <Link href="/polls" className="text-black font-semibold">All Polls</Link> */}
 
 
           {/* ✅ ADMIN ONLY */}

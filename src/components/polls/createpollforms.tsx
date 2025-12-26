@@ -33,41 +33,80 @@ export default function CreatePollForm() {
     }
 
     setLoading(false);
-    router.refresh(); // reload admin polls table
+    router.refresh();
   };
 
   return (
-    <div className="space-y-4">
-      <Input
-        placeholder="Poll title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
+    <div className="max-w-xl mx-auto rounded-2xl border bg-white p-6 shadow-sm space-y-6">
+      {/* Header */}
+      <div>
+        <h2 className="text-xl font-semibold text-slate-900">
+          Create a new poll
+        </h2>
+        <p className="text-sm text-slate-500 mt-1">
+          Add a question and multiple options for users to vote.
+        </p>
+      </div>
 
-      <Input
-        placeholder="Description (optional)"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-      />
-
-      {options.map((opt, i) => (
+      {/* Title */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-slate-700">
+          Poll Title
+        </label>
         <Input
-          key={i}
-          placeholder={`Option ${i + 1}`}
-          value={opt}
-          onChange={(e) => {
-            const copy = [...options];
-            copy[i] = e.target.value;
-            setOptions(copy);
-          }}
+          placeholder="e.g. Best programming language?"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
         />
-      ))}
+      </div>
 
-      <Button variant="outline" onClick={addOption}>
-        + Add option
-      </Button>
+      {/* Description */}
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-slate-700">
+          Description (optional)
+        </label>
+        <Input
+          placeholder="Short description about the poll"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+      </div>
 
-      <Button onClick={handleSubmit} disabled={loading}>
+      {/* Options */}
+      <div className="space-y-3">
+        <label className="text-sm font-medium text-slate-700">
+          Poll Options
+        </label>
+
+        {options.map((opt, i) => (
+          <Input
+            key={i}
+            placeholder={`Option ${i + 1}`}
+            value={opt}
+            onChange={(e) => {
+              const copy = [...options];
+              copy[i] = e.target.value;
+              setOptions(copy);
+            }}
+          />
+        ))}
+
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={addOption}
+          className="w-fit"
+        >
+           Add option +
+        </Button>
+      </div>
+
+      {/* Action */}
+      <Button
+        onClick={handleSubmit}
+        disabled={loading}
+        className="w-full rounded-xl py-6 text-base"
+      >
         {loading ? "Creating..." : "Create Poll"}
       </Button>
     </div>

@@ -2,9 +2,13 @@ import CreatePollForm from "@/components/polls/createpollforms";
 
 export default function CreatePollPage() {
   return (
-    <div className="p-6 max-w-xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Create a Poll</h1>
-      <CreatePollForm />
+    <div className="min-h-screen bg-slate-50 px-4 py-10">
+     
+
+        {/* Form Card */}
+        <div >
+          <CreatePollForm />
+        </div>
     </div>
   );
 }

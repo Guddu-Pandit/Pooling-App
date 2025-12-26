@@ -2,6 +2,7 @@ import { createClient } from "@/utils/supabase/server";
 import PollList from "@/components/polls/polllist";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { Plus } from "lucide-react";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -12,7 +13,6 @@ export default async function DashboardPage() {
 
   if (!user) redirect("/");
 
-  // ✅ FETCH POLLS WITH OPTIONS
   const { data: polls, error } = await supabase
     .from("polls")
     .select(`
@@ -33,20 +33,50 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
+    <div className="min-h-screen px-6 py-8 ">
+      <div className="max-w-6xl mx-auto space-y-8">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+              Dashboard
+            </h1>
+            <p className="text-sm text-slate-500 mt-1">
+              View and manage all active polls
+            </p>
+          </div>
 
-        <Link
-          href="/polls/create"
-          className="px-4 py-2 bg-primary text-white rounded"
-        >
-          Create Poll
-        </Link>
+          <Link
+            href="/polls/create"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-md font-medium text-white shadow-sm transition-all hover:scale-[1.02] hover:shadow-md active:scale-95"
+          >
+            <Plus />Create Poll
+          </Link>
+        </div>
+
+        {/* Content Card */}
+        <div className="rounded-2xl border grid border-slate-200 bg-white/80 backdrop-blur p-6 shadow-sm">
+          {polls && polls.length > 0 ? (
+            <PollList polls={polls} />
+          ) : (
+            <div className="text-center py-16">
+              <h3 className="text-lg font-semibold text-slate-800">
+                No active polls
+              </h3>
+              <p className="text-sm text-slate-500 mt-2">
+                Create your first poll to get started.
+              </p>
+
+              <Link
+                href="/polls/create"
+                className="inline-block mt-6 rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-white shadow transition hover:shadow-md"
+              >
+                Create your first poll
+              </Link>
+            </div>
+          )}
+        </div>
       </div>
-
-      {/* ✅ SEND OPTIONS ALSO */}
-      <PollList polls={polls ?? []} />
     </div>
   );
 }
