@@ -26,7 +26,7 @@ type UserRow = {
   vote_count: number;
 };
 
-export default function AdminUsersPage() {
+export default function AdminPage() {
   const supabase = createClient();
   const router = useRouter();
 
@@ -34,7 +34,7 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
-  // 🔄 Fetch current user
+  // 🔄 Init
   useEffect(() => {
     const init = async () => {
       const {
@@ -109,34 +109,20 @@ export default function AdminUsersPage() {
     fetchUsers();
   };
 
-  // 🗑 Delete user (SAME STYLE AS VOTEFORM DELETE)
+  // 🗑 Delete user
   const deleteUser = async (userId: string) => {
-    try {
-      const res = await fetch(`/api/admin/users/${userId}`, {
-        method: "DELETE",
-      });
+    const res = await fetch(`/api/admin/users/${userId}`, {
+      method: "DELETE",
+    });
 
-      const text = await res.text();
-      let data;
+    const data = await res.json();
 
-      try {
-        data = JSON.parse(text);
-      } catch {
-        data = { error: text };
-      }
-
-      console.log("DELETE USER RESPONSE:", res.status, data);
-
-      if (!res.ok) {
-        alert(data.error || "Failed to delete user");
-        return;
-      }
-
-      fetchUsers();
-    } catch (err) {
-      console.error(err);
-      alert("Network error while deleting user");
+    if (!res.ok) {
+      alert(data.error || "Failed to delete user");
+      return;
     }
+
+    fetchUsers();
   };
 
   if (loading) {
@@ -145,6 +131,8 @@ export default function AdminUsersPage() {
 
   return (
     <div className="p-6 space-y-6">
+      <h1 className="text-2xl font-bold">Admin Panel</h1>
+
       <div className="overflow-x-auto rounded-xl border">
         <table className="w-full text-sm">
           <thead className="bg-gray-100">
@@ -171,7 +159,6 @@ export default function AdminUsersPage() {
                   <td className="p-3 text-center capitalize">{u.role}</td>
 
                   <td className="p-3 flex gap-2 justify-center">
-                    {/* Make Admin */}
                     {u.role !== "admin" && (
                       <Button
                         size="sm"
@@ -182,7 +169,6 @@ export default function AdminUsersPage() {
                       </Button>
                     )}
 
-                    {/* Delete User */}
                     {!isSelf && (
                       <AlertDialog>
                         <AlertDialogTrigger asChild>

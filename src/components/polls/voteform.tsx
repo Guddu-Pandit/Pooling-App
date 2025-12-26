@@ -24,11 +24,34 @@ export default function VoteForm({ poll }: any) {
   const [selected, setSelected] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [hasVoted, setHasVoted] = useState(false);
+
   const [results, setResults] = useState<Record<string, number>>({});
   const [totalVotes, setTotalVotes] = useState(0);
   const [canDelete, setCanDelete] = useState(false);
 
+  // ----------------------------
+  // ✅ Fetch poll results
+  // ----------------------------
+  const fetchResults = async () => {
+    const { data } = await supabase
+      .from("votes")
+      .select("option_id")
+      .eq("poll_id", poll.id);
+
+    if (!data) return;
+
+    const count: Record<string, number> = {};
+    data.forEach((v) => {
+      count[v.option_id] = (count[v.option_id] || 0) + 1;
+    });
+
+    setResults(count);
+    setTotalVotes(data.length);
+  };
+
+  // ----------------------------
   // ✅ Check if user already voted
+  // ----------------------------
   useEffect(() => {
     const checkVote = async () => {
       const {
@@ -47,13 +70,18 @@ export default function VoteForm({ poll }: any) {
       if (data) {
         setHasVoted(true);
         setSelected(data.option_id);
+
+        // 🔥 IMPORTANT
+        await fetchResults();
       }
     };
 
     checkVote();
-  }, [poll.id, supabase]);
+  }, [poll.id]);
 
-  // ✅ Check delete permission (owner / admin)
+  // ----------------------------
+  // ✅ Check delete permission
+  // ----------------------------
   useEffect(() => {
     const checkPermission = async () => {
       const {
@@ -74,33 +102,11 @@ export default function VoteForm({ poll }: any) {
     };
 
     checkPermission();
-  }, [poll.created_by, supabase]);
+  }, [poll.created_by]);
 
-  // ✅ Fetch results after voting
-  useEffect(() => {
-    if (!hasVoted) return;
-
-    const fetchResults = async () => {
-      const { data } = await supabase
-        .from("votes")
-        .select("option_id")
-        .eq("poll_id", poll.id);
-
-      if (!data) return;
-
-      const count: Record<string, number> = {};
-      data.forEach((v) => {
-        count[v.option_id] = (count[v.option_id] || 0) + 1;
-      });
-
-      setResults(count);
-      setTotalVotes(data.length);
-    };
-
-    fetchResults();
-  }, [hasVoted, poll.id, supabase]);
-
+  // ----------------------------
   // ✅ Submit vote
+  // ----------------------------
   const submitVote = async () => {
     if (!selected) return alert("Select an option");
 
@@ -122,16 +128,22 @@ export default function VoteForm({ poll }: any) {
       user_id: user.id,
     });
 
-    if (!error) {
-      setHasVoted(true);
-    } else {
+    if (error) {
       alert(error.message);
+      setLoading(false);
+      return;
     }
+
+    // 🔥 CRITICAL FIX
+    setHasVoted(true);
+    await fetchResults(); // 👈 force results for users
 
     setLoading(false);
   };
 
+  // ----------------------------
   // ✅ Delete poll
+  // ----------------------------
   const deletePoll = async () => {
     const res = await fetch(`/api/polls/${poll.id}/delete`, {
       method: "DELETE",
@@ -147,6 +159,9 @@ export default function VoteForm({ poll }: any) {
     router.refresh();
   };
 
+  // ----------------------------
+  // ✅ UI
+  // ----------------------------
   return (
     <div className="space-y-4">
       {poll.poll_options.map((opt: any) => {
@@ -211,22 +226,20 @@ export default function VoteForm({ poll }: any) {
 
       {/* Actions */}
       <div className="flex items-center gap-3 max-w-md">
-        {/* Vote Button */}
         <Button
           onClick={submitVote}
           disabled={loading || hasVoted}
-          className="flex-1 rounded-xl cursor-pointer bg-gray-900 py-5 hover:text-white hover:bg-gray-700"
+          className="flex-1 rounded-xl cursor-pointer bg-gray-900 py-5 hover:bg-gray-700"
         >
           {hasVoted ? "Voted !" : loading ? "Submitting..." : "Vote"}
         </Button>
 
-        {/* Delete Button with AlertDialog */}
         {canDelete && (
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button
                 variant="destructive"
-                className="shrink-0 px-5 py-5 rounded-xl cursor-pointer bg-red-200 text-red-500 hover:text-white"
+                className="px-5 py-5 rounded-xl bg-red-200 text-red-500 hover:text-white"
               >
                 Delete
               </Button>
@@ -234,22 +247,17 @@ export default function VoteForm({ poll }: any) {
 
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>
-                  Delete this poll?
-                </AlertDialogTitle>
+                <AlertDialogTitle>Delete this poll?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This action cannot be undone. This will permanently
-                  delete the poll and all its votes.
+                  This will permanently delete the poll and all votes.
                 </AlertDialogDescription>
               </AlertDialogHeader>
 
               <AlertDialogFooter>
-                <AlertDialogCancel>
-                  Cancel
-                </AlertDialogCancel>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={deletePoll}
-                  className="bg-gray-900 hover:bg-gray-700 cursor-pointer"
+                  className="bg-gray-900 hover:bg-gray-700"
                 >
                   Continue
                 </AlertDialogAction>
