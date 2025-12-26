@@ -26,7 +26,8 @@ export default function PollList({ polls }: Props) {
     <div className="grid gap-6
      grid-cols-1          /* Mobile: 1 poll */
         md:grid-cols-2       /* ≥768px: 2 polls per row */
-        lg:grid-cols-2  ">
+        lg:grid-cols-2  
+        bg-white ">
       {polls.map((poll) => (
         <PollCard key={poll.id} poll={poll} />
       ))}

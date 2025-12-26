@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import Navbar from "@/components/layout/navbar";
+import AdminUsersPage from "./user/page";
 
 export default function AdminPage() {
   return (
@@ -7,19 +9,21 @@ export default function AdminPage() {
 
       <h1 className="text-2xl font-bold">Admin Panel</h1>
 
-      <div className="flex gap-4">
+      <AdminUsersPage />
+
+      {/* <div className="flex gap-4">
         <Link href="/admin/users">
           <Button>Manage Users</Button>
         </Link>
 
-        {/* <Link href="/admin/polls">
+        <Link href="/admin/polls">
           <Button>Manage Polls</Button>
-        </Link> */}
+        </Link>
 
         <Link href="/admin/analytics">
           <Button>Analytics</Button>
         </Link>
-      </div>
+      </div> */}
     </div>
   );
 }

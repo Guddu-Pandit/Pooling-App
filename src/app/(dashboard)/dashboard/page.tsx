@@ -55,11 +55,11 @@ export default async function DashboardPage() {
         </div>
 
         {/* Content Card */}
-        <div className="rounded-2xl border grid border-slate-200 bg-white/80 backdrop-blur p-6 shadow-sm">
+        <div className="rounded-2xl border grid border-slate-200 bg-slate-80 backdrop-blur p-6 shadow-sm">
           {polls && polls.length > 0 ? (
             <PollList polls={polls} />
           ) : (
-            <div className="text-center py-16">
+            <div className="text-center py-16 ">
               <h3 className="text-lg font-semibold text-slate-800">
                 No active polls
               </h3>

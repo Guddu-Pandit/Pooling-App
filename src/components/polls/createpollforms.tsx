@@ -4,9 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 
 export default function CreatePollForm() {
   const router = useRouter();
+  const { toast } = useToast();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -14,6 +16,11 @@ export default function CreatePollForm() {
   const [loading, setLoading] = useState(false);
 
   const addOption = () => setOptions([...options, ""]);
+
+  const removeOption = (index: number) => {
+    if (options.length <= 2) return; // minimum 2 options
+    setOptions(options.filter((_, i) => i !== index));
+  };
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -27,12 +34,30 @@ export default function CreatePollForm() {
     const data = await res.json();
 
     if (!res.ok) {
-      alert(data.error || "Failed to create poll");
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: data.error || "Failed to create poll",
+      });
       setLoading(false);
       return;
     }
 
+    // ✅ Success toast
+    toast({
+      title: "Poll Created 🎉",
+      description: "Your poll has been successfully created.",
+    });
+
+    // ✅ Reset form
+    setTitle("");
+    setDescription("");
+    setOptions(["", ""]);
+
     setLoading(false);
+
+    // ✅ Redirect
+    router.push("/dashboard");
     router.refresh();
   };
 
@@ -79,16 +104,27 @@ export default function CreatePollForm() {
         </label>
 
         {options.map((opt, i) => (
-          <Input
-            key={i}
-            placeholder={`Option ${i + 1}`}
-            value={opt}
-            onChange={(e) => {
-              const copy = [...options];
-              copy[i] = e.target.value;
-              setOptions(copy);
-            }}
-          />
+          <div key={i} className="flex gap-2">
+            <Input
+              placeholder={`Option ${i + 1}`}
+              value={opt}
+              onChange={(e) => {
+                const copy = [...options];
+                copy[i] = e.target.value;
+                setOptions(copy);
+              }}
+            />
+
+            {options.length > 2 && (
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => removeOption(i)}
+              >
+                ✕
+              </Button>
+            )}
+          </div>
         ))}
 
         <Button
@@ -97,7 +133,7 @@ export default function CreatePollForm() {
           onClick={addOption}
           className="w-fit"
         >
-           Add option +
+          Add option +
         </Button>
       </div>
 
